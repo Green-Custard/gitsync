@@ -1,0 +1,52 @@
+{
+    "typeName": "GC::GitSync::Job",
+    "description": "Git Sync Jobs for an existing GC Git Sync solution",
+    "sourceUrl": "https://github.com/attila-varga-gc/gitsync.git",
+    "properties": {
+        "JobID": {
+            "description": "A JobID is assigned to a Job on CREATE or UPDATE, Jobs are immutable.",
+            "type": "string",
+            "pattern": "^[A-Z]{3,5}[0-9]{8}-[0-9]{4}$"
+        },
+        "Description": {
+            "description": "The description of the Sync Job.",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9=:#@/\\-,.][a-zA-Z0-9+=:#@/\\-,.\\s]+[a-zA-Z0-9+=:#@/\\-,.]{1,256}$"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "Description"
+    ],
+    "readOnlyProperties": [
+        "/properties/JobID"
+    ],
+    "createOnlyProperties": [
+        "/properties/Description"
+    ],
+    "primaryIdentifier": [
+        "/properties/JobID"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "gitSync:CreateJob"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "gitSync:DescribeJob"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "gitSync:DeleteJob"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "gitSync:ListJobs"
+            ]
+        }
+    }
+}
