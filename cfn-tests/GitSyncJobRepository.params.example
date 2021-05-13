@@ -1,0 +1,4 @@
+GitSyncServiceURL=https://example.com
+GitSyncAccessToken=*******
+GitSyncAccessSecret=*******
+GitSyncServiceRole=arn:aws:iam::XXXXXXXXXXXX:role/YYYYYYYYYY

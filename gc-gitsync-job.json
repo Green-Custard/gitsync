@@ -3,26 +3,91 @@
     "description": "Git Sync Jobs for an existing GC Git Sync solution",
     "sourceUrl": "https://github.com/attila-varga-gc/gitsync.git",
     "properties": {
-        "JobID": {
-            "description": "A JobID is assigned to a Job on CREATE or UPDATE, Jobs are immutable.",
-            "type": "string",
-            "pattern": "^[A-Z]{3,5}[0-9]{8}-[0-9]{4}$"
-        },
         "Description": {
             "description": "The description of the Sync Job.",
             "type": "string",
             "pattern": "^[a-zA-Z0-9=:#@/\\-,.][a-zA-Z0-9+=:#@/\\-,.\\s]+[a-zA-Z0-9+=:#@/\\-,.]{1,256}$"
+        },
+        "GitSyncServiceURL": {
+            "description": "Service URL of the GitSync Service.",
+            "type": "string"
+        },
+        "GitSyncAccessToken": {
+            "description": "Access Token for the GitSync Service.",
+            "type": "string"
+        },
+        "GitSyncAccessSecret": {
+            "description": "Access Token for the GitSync Service.",
+            "type": "string"
+        },
+        "Repository": {
+            "description": "Repository SSH URL of the remote source",
+            "type": "string"
+        },
+        "RepositoryType": {
+            "description": "Repository Type of the remote source",
+            "type": "string",
+            "enum": [
+                "GITHUB"
+            ]
+        },
+        "CodeCommitRepository": {
+            "description": "CodeCommit Repository to sync into",
+            "type": "string"
+        },
+        "CodeCommitAccessRoleArn": {
+            "description": "The Amazon Resource Name (ARN) of the IAM role that the GitSync Service will assume.",
+            "type": "string",
+            "pattern": "^arn:aws[A-Za-z0-9-]{0,64}:iam:.*:([0-9]{12})?:role/.+$",
+            "minLength": 1,
+            "maxLength": 1283
+        },
+        "JobID": {
+            "description": "A JobID is assigned to a Job on CREATE or UPDATE, Jobs are immutable.",
+            "type": "string"
+        },
+        "DeployKey": {
+            "description": "A public key to be used to fetch the remote SSH git repository",
+            "type": "string"
+        },
+        "WebhookURL": {
+            "description": "Webhook created by the GitSync service to trigger the Sync Job",
+            "type": "string"
+        },
+        "WebhookSecret": {
+            "description": "Webhook Secret created by the GitSync service to trigger the Sync Job",
+            "type": "string"
         }
     },
     "additionalProperties": false,
     "required": [
-        "Description"
+        "Description",
+        "GitSyncServiceURL",
+        "GitSyncAccessToken",
+        "GitSyncAccessSecret",
+        "Repository",
+        "RepositoryType",
+        "CodeCommitRepository",
+        "CodeCommitAccessRoleArn"
     ],
     "readOnlyProperties": [
-        "/properties/JobID"
+        "/properties/JobID",
+        "/properties/DeployKey",
+        "/properties/WebhookURL",
+        "/properties/WebhookSecret"
     ],
     "createOnlyProperties": [
-        "/properties/Description"
+        "/properties/Description",
+        "/properties/GitSyncServiceURL",
+        "/properties/GitSyncAccessToken",
+        "/properties/GitSyncAccessSecret",
+        "/properties/Repository",
+        "/properties/RepositoryType",
+        "/properties/CodeCommitRepository",
+        "/properties/CodeCommitAccessRoleArn"
+    ],
+    "writeOnlyProperties": [
+        "/properties/GitSyncAccessSecret"
     ],
     "primaryIdentifier": [
         "/properties/JobID"

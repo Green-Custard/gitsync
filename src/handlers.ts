@@ -10,8 +10,14 @@ import {
     ProgressEvent,
     ResourceHandlerRequest,
     SessionProxy,
+    LambdaContext,
+    Dict,
 } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import { ResourceModel } from './models';
+
+import { RepositoryType } from './gitSyncAPI';
+
+let gitSyncFactory = import('./gitSync');
 
 interface CallbackContext extends Record<string, any> {}
 
@@ -23,10 +29,23 @@ class Resource extends BaseResource<ResourceModel> {
         callbackContext: CallbackContext,
         logger: LoggerProxy
     ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        const gitSync = await gitSyncFactory;
         const model = new ResourceModel(request.desiredResourceState);
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
         try {
-            model.jobID = String(Math.floor(Math.random() * 100000000));
+            const job = await gitSync.create({
+                gitSyncServiceURL: model.gitSyncServiceURL,
+                gitSyncAccessToken: model.gitSyncAccessToken,
+                gitSyncAccessSecret: model.gitSyncAccessSecret,
+                repository: model.repository,
+                repositoryType: model.repositoryType as RepositoryType,
+                codeCommitRepository: model.codeCommitRepository,
+                codeCommitAccessRoleArn: model.codeCommitAccessRoleArn,
+            }, logger);
+            model.jobID = job.jobID;
+            model.deployKey = job.deployKey;
+            model.webhookURL = job.webhookURL;
+            model.webhookSecret = job.webhookSecret;
             progress.status = OperationStatus.Success;
         } catch(err) {
             logger.log(err);
@@ -68,8 +87,25 @@ class Resource extends BaseResource<ResourceModel> {
         callbackContext: CallbackContext,
         logger: LoggerProxy
     ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        const gitSync = await gitSyncFactory;
         const model = new ResourceModel(request.desiredResourceState);
-        const progress = ProgressEvent.success<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        try {
+            const job = await gitSync.get({
+                JobID: model.jobID,
+                gitSyncServiceURL: model.gitSyncServiceURL,
+                gitSyncAccessToken: model.gitSyncAccessToken,
+                gitSyncAccessSecret: model.gitSyncAccessSecret,
+            }, logger);
+            model.jobID = job.jobID;
+            model.deployKey = job.deployKey;
+            model.webhookURL = job.webhookURL;
+            model.webhookSecret = job.webhookSecret;
+            progress.status = OperationStatus.Success;
+        } catch(err) {
+            logger.log(err);
+            return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(HandlerErrorCode.InternalFailure, err.message);
+        }
         return progress;
     }
 
@@ -80,19 +116,36 @@ class Resource extends BaseResource<ResourceModel> {
         callbackContext: CallbackContext,
         logger: LoggerProxy
     ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        const gitSync = await gitSyncFactory;
         const model = new ResourceModel(request.desiredResourceState);
-        const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
-            .status(OperationStatus.Success)
-            .resourceModels([model])
-            .build();
-        return progress;
+        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
+        try {
+            const job = await gitSync.get({
+                JobID: model.jobID,
+                gitSyncServiceURL: model.gitSyncServiceURL,
+                gitSyncAccessToken: model.gitSyncAccessToken,
+                gitSyncAccessSecret: model.gitSyncAccessSecret,
+            }, logger);
+            model.jobID = job.jobID;
+            model.deployKey = job.deployKey;
+            model.webhookURL = job.webhookURL;
+            model.webhookSecret = job.webhookSecret;
+            return ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
+                .status(OperationStatus.Success)
+                .resourceModels([model])
+                .build();
+        } catch(err) {
+            logger.log(err);
+            return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(HandlerErrorCode.InternalFailure, err.message);
+        };
     }
 }
 
 export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
-// Entrypoint for production usage after registered in CloudFormation
 export const entrypoint = resource.entrypoint;
 
-// Entrypoint used for local testing
-export const testEntrypoint = resource.testEntrypoint;
+export function testEntrypoint(eventData: any, context?: Partial<LambdaContext>): Promise<ProgressEvent<ResourceModel, Dict<any>>> {
+    gitSyncFactory = import('./__mocks__/gitSync');
+    return resource.testEntrypoint(eventData, context);
+}

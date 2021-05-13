@@ -11,15 +11,6 @@ export class ResourceModel extends BaseModel {
     @Exclude()
     protected readonly IDENTIFIER_KEY_JOBID: string = '/properties/JobID';
 
-    @Expose({ name: 'JobID' })
-    @Transform(
-        (value: any, obj: any) =>
-            transformValue(String, 'jobID', value, obj, []),
-        {
-            toClassOnly: true,
-        }
-    )
-    jobID?: Optional<string>;
     @Expose({ name: 'Description' })
     @Transform(
         (value: any, obj: any) =>
@@ -29,6 +20,105 @@ export class ResourceModel extends BaseModel {
         }
     )
     description?: Optional<string>;
+    @Expose({ name: 'GitSyncServiceURL' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'gitSyncServiceURL', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    gitSyncServiceURL?: Optional<string>;
+    @Expose({ name: 'GitSyncAccessToken' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'gitSyncAccessToken', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    gitSyncAccessToken?: Optional<string>;
+    @Expose({ name: 'GitSyncAccessSecret' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'gitSyncAccessSecret', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    gitSyncAccessSecret?: Optional<string>;
+    @Expose({ name: 'Repository' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'repository', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    repository?: Optional<string>;
+    @Expose({ name: 'RepositoryType' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'repositoryType', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    repositoryType?: Optional<string>;
+    @Expose({ name: 'CodeCommitRepository' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'codeCommitRepository', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    codeCommitRepository?: Optional<string>;
+    @Expose({ name: 'CodeCommitAccessRoleArn' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'codeCommitAccessRoleArn', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    codeCommitAccessRoleArn?: Optional<string>;
+    @Expose({ name: 'JobID' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'jobID', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    jobID?: Optional<string>;
+    @Expose({ name: 'DeployKey' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'deployKey', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    deployKey?: Optional<string>;
+    @Expose({ name: 'WebhookURL' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'webhookURL', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    webhookURL?: Optional<string>;
+    @Expose({ name: 'WebhookSecret' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'webhookSecret', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    webhookSecret?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {
