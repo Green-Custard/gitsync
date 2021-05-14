@@ -15,8 +15,8 @@ export type CreateProps = {
   codeCommitAccessRoleArn: string;
 } & CommonProps;
 
-export type GetProps = {
-  JobID: string;
+export type DelProps = {
+  jobID: string;
 } & CommonProps;
 
 

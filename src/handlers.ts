@@ -1,7 +1,6 @@
 import {
     Action,
     BaseResource,
-    exceptions,
     handlerEvent,
     HandlerErrorCode,
     LoggerProxy,
@@ -74,70 +73,44 @@ class Resource extends BaseResource<ResourceModel> {
         callbackContext: CallbackContext,
         logger: LoggerProxy
     ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
+        const gitSync = await gitSyncFactory;
         const model = new ResourceModel(request.desiredResourceState);
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
+        await gitSync.del({
+            jobID: model.jobID,
+            gitSyncServiceURL: model.gitSyncServiceURL,
+            gitSyncAccessToken: model.gitSyncAccessToken,
+            gitSyncAccessSecret: model.gitSyncAccessSecret,
+        }, logger);
         progress.status = OperationStatus.Success;
         return progress;
     }
 
     @handlerEvent(Action.Read)
-    public async read(
+    public read(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
         logger: LoggerProxy
-    ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-        const gitSync = await gitSyncFactory;
+    ): ProgressEvent<ResourceModel, CallbackContext> {
         const model = new ResourceModel(request.desiredResourceState);
         const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        try {
-            const job = await gitSync.get({
-                JobID: model.jobID,
-                gitSyncServiceURL: model.gitSyncServiceURL,
-                gitSyncAccessToken: model.gitSyncAccessToken,
-                gitSyncAccessSecret: model.gitSyncAccessSecret,
-            }, logger);
-            model.jobID = job.jobID;
-            model.deployKey = job.deployKey;
-            model.webhookURL = job.webhookURL;
-            model.webhookSecret = job.webhookSecret;
-            progress.status = OperationStatus.Success;
-        } catch(err) {
-            logger.log(err);
-            return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(HandlerErrorCode.InternalFailure, err.message);
-        }
+        progress.status = OperationStatus.Success;
         return progress;
     }
 
     @handlerEvent(Action.List)
-    public async list(
+    public list(
         session: Optional<SessionProxy>,
         request: ResourceHandlerRequest<ResourceModel>,
         callbackContext: CallbackContext,
         logger: LoggerProxy
-    ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-        const gitSync = await gitSyncFactory;
+    ): ProgressEvent<ResourceModel, CallbackContext> {
         const model = new ResourceModel(request.desiredResourceState);
-        const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
-        try {
-            const job = await gitSync.get({
-                JobID: model.jobID,
-                gitSyncServiceURL: model.gitSyncServiceURL,
-                gitSyncAccessToken: model.gitSyncAccessToken,
-                gitSyncAccessSecret: model.gitSyncAccessSecret,
-            }, logger);
-            model.jobID = job.jobID;
-            model.deployKey = job.deployKey;
-            model.webhookURL = job.webhookURL;
-            model.webhookSecret = job.webhookSecret;
-            return ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
-                .status(OperationStatus.Success)
-                .resourceModels([model])
-                .build();
-        } catch(err) {
-            logger.log(err);
-            return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(HandlerErrorCode.InternalFailure, err.message);
-        };
+        return ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
+            .status(OperationStatus.Success)
+            .resourceModels([model])
+            .build();
     }
 }
 

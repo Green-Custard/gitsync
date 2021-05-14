@@ -133,10 +133,6 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 ## Return Values
 
-### Ref
-
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the JobID.
-
 ### Fn::GetAtt
 
 The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of this type. The following are the available attributes and sample return values.

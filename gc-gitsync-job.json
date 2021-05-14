@@ -90,7 +90,10 @@
         "/properties/GitSyncAccessSecret"
     ],
     "primaryIdentifier": [
-        "/properties/JobID"
+        "/properties/JobID",
+        "/properties/DeployKey",
+        "/properties/WebhookURL",
+        "/properties/WebhookSecret"
     ],
     "handlers": {
         "create": {

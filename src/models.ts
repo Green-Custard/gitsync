@@ -10,6 +10,12 @@ export class ResourceModel extends BaseModel {
 
     @Exclude()
     protected readonly IDENTIFIER_KEY_JOBID: string = '/properties/JobID';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_DEPLOYKEY: string = '/properties/DeployKey';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_WEBHOOKURL: string = '/properties/WebhookURL';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_WEBHOOKSECRET: string = '/properties/WebhookSecret';
 
     @Expose({ name: 'Description' })
     @Transform(
@@ -127,8 +133,20 @@ export class ResourceModel extends BaseModel {
             identifier[this.IDENTIFIER_KEY_JOBID] = this.jobID;
         }
 
+        if (this.deployKey != null) {
+            identifier[this.IDENTIFIER_KEY_DEPLOYKEY] = this.deployKey;
+        }
+
+        if (this.webhookURL != null) {
+            identifier[this.IDENTIFIER_KEY_WEBHOOKURL] = this.webhookURL;
+        }
+
+        if (this.webhookSecret != null) {
+            identifier[this.IDENTIFIER_KEY_WEBHOOKSECRET] = this.webhookSecret;
+        }
+
         // only return the identifier if it can be used, i.e. if all components are present
-        return Object.keys(identifier).length === 1 ? identifier : null;
+        return Object.keys(identifier).length === 4 ? identifier : null;
     }
 
     @Exclude()
