@@ -75,7 +75,7 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 #### GitSyncAccessSecret
 
-Access Token for the GitSync Service.
+Access Secret for the GitSync Service.
 
 _Required_: Yes
 
