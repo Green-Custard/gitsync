@@ -8,6 +8,7 @@ export const create = async(props: CreateProps, logger: LoggerProxy): Promise<Gi
     deployKey: 'ssh-rsa 1234',
     webhookURL: 'https://example.com',
     webhookSecret: '1234',
+    syncStatusURL: 'https://example.com'
   }
 }
 

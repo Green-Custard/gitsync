@@ -16,6 +16,8 @@ export class ResourceModel extends BaseModel {
     protected readonly IDENTIFIER_KEY_WEBHOOKURL: string = '/properties/WebhookURL';
     @Exclude()
     protected readonly IDENTIFIER_KEY_WEBHOOKSECRET: string = '/properties/WebhookSecret';
+    @Exclude()
+    protected readonly IDENTIFIER_KEY_SYNCSTATUSURL: string = '/properties/SyncStatusURL';
 
     @Expose({ name: 'Description' })
     @Transform(
@@ -125,6 +127,15 @@ export class ResourceModel extends BaseModel {
         }
     )
     webhookSecret?: Optional<string>;
+    @Expose({ name: 'SyncStatusURL' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'syncStatusURL', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    syncStatusURL?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {
@@ -145,8 +156,12 @@ export class ResourceModel extends BaseModel {
             identifier[this.IDENTIFIER_KEY_WEBHOOKSECRET] = this.webhookSecret;
         }
 
+        if (this.syncStatusURL != null) {
+            identifier[this.IDENTIFIER_KEY_SYNCSTATUSURL] = this.syncStatusURL;
+        }
+
         // only return the identifier if it can be used, i.e. if all components are present
-        return Object.keys(identifier).length === 4 ? identifier : null;
+        return Object.keys(identifier).length === 5 ? identifier : null;
     }
 
     @Exclude()

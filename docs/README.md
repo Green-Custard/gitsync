@@ -155,3 +155,7 @@ Webhook created by the GitSync service to trigger the Sync Job
 
 Webhook Secret created by the GitSync service to trigger the Sync Job
 
+#### SyncStatusURL
+
+Status page created by the GitSync service to check the sync status
+

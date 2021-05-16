@@ -51,6 +51,7 @@ export const create = async(props: CreateProps, logger: LoggerProxy): Promise<Gi
     deployKey: response.data.publicKey,
     webhookURL: `${props.gitSyncServiceURL}/webhook/${response.data.id}`,
     webhookSecret: response.data.secret,
+    syncStatusURL: `${props.gitSyncServiceURL}/status/${response.data.id}`
   }
 }
 

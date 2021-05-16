@@ -45,6 +45,7 @@ class Resource extends BaseResource<ResourceModel> {
             model.deployKey = job.deployKey;
             model.webhookURL = job.webhookURL;
             model.webhookSecret = job.webhookSecret;
+            model.syncStatusURL = job.syncStatusURL;
             progress.status = OperationStatus.Success;
         } catch(err) {
             logger.log(err);

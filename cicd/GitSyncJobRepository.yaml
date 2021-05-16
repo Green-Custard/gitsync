@@ -213,3 +213,5 @@ Outputs:
     Value: !Sub '${GitSyncJobRepositoryJob.WebhookURL}'
   WebhookSecret:
     Value: !Sub '${GitSyncJobRepositoryJob.WebhookSecret}'
+  SyncStatusURL:
+    Value: !Sub '${GitSyncJobRepositoryJob.SyncStatusURL}'

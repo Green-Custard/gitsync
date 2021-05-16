@@ -24,5 +24,6 @@ export type GitSyncJob = {
   jobID: string;
   webhookURL: string;
   webhookSecret: string;
+  syncStatusURL: string;
   deployKey: string;
 }

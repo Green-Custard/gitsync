@@ -57,6 +57,10 @@
         "WebhookSecret": {
             "description": "Webhook Secret created by the GitSync service to trigger the Sync Job",
             "type": "string"
+        },
+        "SyncStatusURL": {
+            "description": "Status page created by the GitSync service to check the sync status",
+            "type": "string"
         }
     },
     "additionalProperties": false,
@@ -74,7 +78,8 @@
         "/properties/JobID",
         "/properties/DeployKey",
         "/properties/WebhookURL",
-        "/properties/WebhookSecret"
+        "/properties/WebhookSecret",
+        "/properties/SyncStatusURL"
     ],
     "createOnlyProperties": [
         "/properties/Description",
@@ -93,7 +98,8 @@
         "/properties/JobID",
         "/properties/DeployKey",
         "/properties/WebhookURL",
-        "/properties/WebhookSecret"
+        "/properties/WebhookSecret",
+        "/properties/SyncStatusURL"
     ],
     "handlers": {
         "create": {
