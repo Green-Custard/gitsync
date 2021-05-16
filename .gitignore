@@ -18,4 +18,4 @@ coverage/
 sam-tests/
 
 # can contain creds
-cfn-tests/**/*.params
+cicd/**/*.params
