@@ -17,7 +17,7 @@
             "type": "string"
         },
         "GitSyncAccessSecret": {
-            "description": "Access Token for the GitSync Service.",
+            "description": "Access Secret for the GitSync Service.",
             "type": "string"
         },
         "Repository": {
