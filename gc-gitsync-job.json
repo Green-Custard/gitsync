@@ -82,6 +82,8 @@
   "createOnlyProperties": [
     "/properties/Description",
     "/properties/GitSyncServiceURL",
+    "/properties/GitSyncAccessToken",
+    "/properties/GitSyncAccessSecret",
     "/properties/Repository",
     "/properties/RepositoryType",
     "/properties/CodeCommitRepository",
