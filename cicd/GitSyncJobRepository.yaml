@@ -1,6 +1,8 @@
-AWSTemplateFormatVersion : '2010-09-09'
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Parameters:
+  SSHGithubURL:
+    Type: String
   GitSyncServiceURL:
     Type: String
   GitSyncAccessToken:
@@ -10,7 +12,7 @@ Parameters:
     NoEcho: True
   GitSyncServiceRole:
     Type: String
-    AllowedPattern: "^arn:aws[A-Za-z0-9-]{0,64}:iam:.*:([0-9]{12})?:role/.+$"
+    AllowedPattern: '^arn:aws[A-Za-z0-9-]{0,64}:iam:.*:([0-9]{12})?:role/.+$'
 Resources:
   # Sync
   GitSyncJobRepository:
@@ -34,7 +36,7 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: "*"
+                Action: '*'
                 Resource:
                   - !Sub '${GitSyncJobRepository.Arn}'
   GitSyncJobRepositoryJob:
@@ -44,7 +46,7 @@ Resources:
       GitSyncServiceURL: !Ref GitSyncServiceURL
       GitSyncAccessToken: !Ref GitSyncAccessToken
       GitSyncAccessSecret: !Ref GitSyncAccessSecret
-      Repository: git@github.com:attila-varga-gc/gitsync.git
+      Repository: !Ref SSHGithubURL
       RepositoryType: GITHUB
       CodeCommitRepository: !Sub 'codecommit::${AWS::Region}://${GitSyncJobRepository.Name}'
       CodeCommitAccessRoleArn: !Sub '${GitSyncJobRepositoryAccessRole.Arn}'
@@ -120,7 +122,7 @@ Resources:
                 - npm install -g typescript
                 - tsc
                 - echo "Deploying ${GIT_TAG}..."
-                - cfn submit --set-default 
+                - cfn submit --set-default
       TimeoutInMinutes: 30
   GitSyncJobCodePipeline:
     Type: AWS::CodePipeline::Pipeline

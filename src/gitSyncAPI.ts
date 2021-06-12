@@ -1,24 +1,33 @@
-export type CommonProps = {
+export type AWSProps = {
+  ssm: AWS.SSM;
+};
+
+export type AuthProps = {
   gitSyncServiceURL: string;
   gitSyncAccessToken: string;
   gitSyncAccessSecret: string;
-}
+};
 
 export enum RepositoryType {
-  GITHUB = 'GITHUB'
-};
+  GITHUB = 'GITHUB',
+}
 
 export type CreateProps = {
   repository: string;
   repositoryType: RepositoryType;
   codeCommitRepository: string;
   codeCommitAccessRoleArn: string;
-} & CommonProps;
+} & AuthProps &
+  AWSProps;
 
 export type DelProps = {
   jobID: string;
-} & CommonProps;
+} & AuthProps &
+  AWSProps;
 
+export type FetchProps = {
+  jobID: string;
+} & AWSProps;
 
 export type GitSyncJob = {
   jobID: string;
@@ -26,4 +35,4 @@ export type GitSyncJob = {
   webhookSecret: string;
   syncStatusURL: string;
   deployKey: string;
-}
+};
