@@ -44,17 +44,25 @@ export const create = async (props: CreateProps, _: LoggerProxy): Promise<GitSyn
     client: props.ssm,
   });
   const instance = createAxios(props);
-  const response = await instance.put<GitSyncServiceResponse>('/syncJob', {
-    source: {
-      url: props.repository,
-    },
-    target: {
-      url: props.codeCommitRepository,
-      args: {
-        roleArn: props.codeCommitAccessRoleArn,
+  let response: AxiosResponse<GitSyncServiceResponse>;
+  try {
+    response = await instance.put<GitSyncServiceResponse>('/syncJob', {
+      source: {
+        url: props.repository,
       },
-    },
-  });
+      target: {
+        url: props.codeCommitRepository,
+        args: {
+          roleArn: props.codeCommitAccessRoleArn,
+        },
+      },
+    });
+  } catch (err) {
+    if (err && err.config) {
+      err.config.headers = {};
+    }
+    throw err;
+  }
   await ssm.put({
     name: `${secretPrefix}/${response.data.id}`,
     content: JSON.stringify(
@@ -98,11 +106,14 @@ export const fetch = async (props: FetchProps, _: LoggerProxy): Promise<GitSyncJ
   let response: AxiosResponse<GitSyncServiceResponse>;
   try {
     response = await instance.get<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
-  } catch (error) {
-    if (error.response.status === 404) {
+  } catch (err) {
+    if (err.response.status === 404) {
       throw new Error(Errors.NOT_FOUND);
     }
-    throw error;
+    if (err && err.config) {
+      err.config.headers = {};
+    }
+    throw err;
   }
 
   return {
@@ -119,14 +130,21 @@ export const del = async (props: DelProps, _: LoggerProxy): Promise<void> => {
     client: props.ssm,
   });
   const instance = createAxios(props);
-  await instance.delete<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
+  try {
+    await instance.delete<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
+  } catch (err) {
+    if (err && err.config) {
+      err.config.headers = {};
+      throw err;
+    }
+  }
   try {
     await ssm.batchDelete([
       {
         name: `${secretPrefix}/${props.jobID}`,
       },
     ]);
-  } catch (e) {
+  } catch (err) {
     throw new Error(Errors.NOT_FOUND);
   }
 };
