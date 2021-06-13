@@ -10,7 +10,8 @@
   "scripts": {
     "build": "npx tsc",
     "prepack": "npm run build",
-    "test": "npx concurrently --kill-others 'sam local start-lambda' 'sleep 3s; cfn test --function-name ContractEntrypoint'"
+    "test": "npx concurrently --kill-others 'sam local start-lambda' 'sleep 3s; cfn test --function-name ContractEntrypoint'",
+    "doc:api": "npx swagger-markdown -i ./documentation/src/swagger.yaml -o ./documentation/api.md"
   },
   "dependencies": {
     "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",

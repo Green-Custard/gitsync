@@ -1,0 +1,192 @@
+swagger: '2.0'
+info:
+  description: This is a sample GitSync server
+  version: '1.0.0'
+  title: GitSync API
+basePath: '/'
+tags:
+  - name: API
+    description: CRUD API for Sync Jobs
+  - name: Webhook
+    description: Webhook API
+  - name: Status
+    description: Status API
+paths:
+  /api/syncJob:
+    put:
+      tags:
+        - API
+      security:
+        - AccessKey: []
+          AccessSecret: []
+      summary: Add a new SyncJob
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: Pet object that needs to be added to the store
+          required: true
+          schema:
+            $ref: '#/definitions/SyncJobPut'
+      responses:
+        '201':
+          description: SyncJob has been created
+          schema:
+            $ref: '#/definitions/SyncJob'
+  /api/syncJob/{id}:
+    get:
+      security:
+        - AccessKey: []
+          AccessSecret: []
+      tags:
+        - API
+      summary: Get a SyncJob
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: SyncJob Id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Got the SyncJob
+          schema:
+            $ref: '#/definitions/SyncJob'
+        '404':
+          description: SyncJob does not exist
+    delete:
+      security:
+        - AccessKey: []
+          AccessSecret: []
+      tags:
+        - API
+      summary: Delete a SyncJob
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: SyncJob Id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Deleted the SyncJob or did not exist
+          schema:
+            $ref: '#/definitions/SyncJob'
+  /webhook/{id}:
+    get:
+      tags:
+        - Webhook
+      summary: Trigger a SyncJob (Request Parameters Vary)
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: SyncJob Id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Responses Vary
+    post:
+      tags:
+        - Webhook
+      summary: Trigger a SyncJob (Request Parameters Vary)
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: SyncJob Id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Responses Vary
+  /status/{id}:
+    get:
+      tags:
+        - Status
+      security:
+        - AccessKeyAndSecretBasicAuth: []
+      summary: SyncJob Status Page
+      produces:
+        - text/html
+      parameters:
+        - in: path
+          name: id
+          description: SyncJob Id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: SyncJob Status Page
+securityDefinitions:
+  AccessKey:
+    type: apiKey
+    in: header
+    name: x-access-key
+  AccessSecret:
+    type: apiKey
+    in: header
+    name: x-access-secret
+  AccessKeyAndSecretBasicAuth:
+    type: basic
+definitions:
+  SyncJob:
+    type: object
+    required:
+      - id
+      - secret
+      - publicKey
+    properties:
+      id:
+        type: string
+      secret:
+        type: string
+        description: Webhook secret
+      publicKey:
+        type: string
+        description: Deploy Key
+  SyncJobPut:
+    type: object
+    required:
+      - source
+      - target
+    properties:
+      source:
+        type: object
+        required:
+          - url
+        properties:
+          url:
+            type: string
+      target:
+        type: object
+        required:
+          - url
+        properties:
+          url:
+            type: string
+          args:
+            type: object
+            required:
+              - roleArn
+            properties:
+              roleArn:
+                type: string
