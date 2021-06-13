@@ -35,9 +35,9 @@ Add a new SyncJob
 
 ##### Parameters
 
-| Name | Located in | Description                                    | Required | Schema                    |
-| ---- | ---------- | ---------------------------------------------- | -------- | ------------------------- |
-| body | body       | Pet object that needs to be added to the store | Yes      | [SyncJobPut](#syncjobput) |
+| Name | Located in | Description                           | Required | Schema                    |
+| ---- | ---------- | ------------------------------------- | -------- | ------------------------- |
+| body | body       | GitSync object that needs to be added | Yes      | [SyncJobPut](#syncjobput) |
 
 ##### Responses
 
