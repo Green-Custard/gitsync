@@ -1,3 +1,9 @@
-# Hello World!
+# GitSync Custom Resource
 
-Hello World!
+## Links
+
+- [Custom Resource Documentation](docs/README.md)
+
+## Purpose
+
+Lorem ipsum
