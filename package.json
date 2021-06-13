@@ -10,7 +10,7 @@
   "scripts": {
     "build": "npx tsc",
     "prepack": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx concurrently --kill-others 'sam local start-lambda' 'sleep 3s; cfn test --function-name ContractEntrypoint'"
   },
   "dependencies": {
     "@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib": "^1.0.1",

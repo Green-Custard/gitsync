@@ -11,10 +11,11 @@ import {
   SessionProxy,
   LambdaContext,
   Dict,
+  CfnResponse,
 } from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import {ResourceModel} from './models';
 
-import {RepositoryType} from './gitSyncAPI';
+import {Errors, RepositoryType} from './gitSyncAPI';
 import AWS from 'aws-sdk';
 
 let gitSyncFactory = import('./gitSync');
@@ -72,16 +73,30 @@ class Resource extends BaseResource<ResourceModel> {
     const gitSync = await gitSyncFactory;
     const model = new ResourceModel(request.desiredResourceState);
     const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
-    await gitSync.del(
-      {
-        ssm: session.client(AWS.SSM),
-        jobID: model.jobID,
-        gitSyncServiceURL: model.gitSyncServiceURL,
-        gitSyncAccessToken: model.gitSyncAccessToken,
-        gitSyncAccessSecret: model.gitSyncAccessSecret,
-      },
-      logger
-    );
+    try {
+      await gitSync.del(
+        {
+          ssm: session.client(AWS.SSM),
+          jobID: model.jobID,
+          gitSyncServiceURL: model.gitSyncServiceURL,
+          gitSyncAccessToken: model.gitSyncAccessToken,
+          gitSyncAccessSecret: model.gitSyncAccessSecret,
+        },
+        logger
+      );
+    } catch (err) {
+      if (err.message === Errors.NOT_FOUND) {
+        return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
+          HandlerErrorCode.NotFound,
+          err.message
+        );
+      }
+      logger.log(err);
+      return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
+        HandlerErrorCode.InternalFailure,
+        err.message
+      );
+    }
     progress.status = OperationStatus.Success;
     return progress;
   }
@@ -93,7 +108,6 @@ class Resource extends BaseResource<ResourceModel> {
     _: CallbackContext,
     logger: LoggerProxy
   ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-    const ssm = session.client(AWS.SSM, session.configuration);
     const gitSync = await gitSyncFactory;
     const model = new ResourceModel(request.desiredResourceState);
     const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
@@ -112,6 +126,12 @@ class Resource extends BaseResource<ResourceModel> {
       model.syncStatusURL = job.syncStatusURL;
       progress.status = OperationStatus.Success;
     } catch (err) {
+      if (err.message === Errors.NOT_FOUND) {
+        return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
+          HandlerErrorCode.NotFound,
+          err.message
+        );
+      }
       logger.log(err);
       return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
         HandlerErrorCode.InternalFailure,
@@ -150,6 +170,12 @@ class Resource extends BaseResource<ResourceModel> {
       model.syncStatusURL = job.syncStatusURL;
       progress.status = OperationStatus.Success;
     } catch (err) {
+      if (err.message === Errors.NOT_FOUND) {
+        return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
+          HandlerErrorCode.NotFound,
+          err.message
+        );
+      }
       logger.log(err);
       return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
         HandlerErrorCode.InternalFailure,
@@ -171,6 +197,14 @@ class Resource extends BaseResource<ResourceModel> {
 export const resource = new Resource(ResourceModel.TYPE_NAME, ResourceModel);
 
 export const entrypoint = resource.entrypoint;
+
+export function contractEntrypoint(
+  eventData: any,
+  context: LambdaContext
+): Promise<CfnResponse<ResourceModel>> {
+  gitSyncFactory = import('./__mocks__/gitSync');
+  return resource.entrypoint(eventData, context);
+}
 
 export function testEntrypoint(
   eventData: any,

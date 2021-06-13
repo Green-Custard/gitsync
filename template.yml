@@ -1,10 +1,10 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: AWS SAM template for the GC::GitSync::Job resource type
 
 Globals:
   Function:
-    Timeout: 180  # docker start-up times can be long for SAM CLI
+    Timeout: 180 # docker start-up times can be long for SAM CLI
     MemorySize: 256
 
 Resources:
@@ -15,10 +15,16 @@ Resources:
       Runtime: nodejs12.x
       CodeUri: ./
 
+  ContractEntrypoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/handlers.contractEntrypoint
+      Runtime: nodejs12.x
+      CodeUri: ./
+
   TypeFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: dist/handlers.entrypoint
       Runtime: nodejs12.x
       CodeUri: ./
-

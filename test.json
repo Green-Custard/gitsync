@@ -8,7 +8,14 @@
   "request": {
     "clientRequestToken": "ecba020e-b2e6-4742-a7d0-8a06ae7c4b2b",
     "desiredResourceState": {
-      "Description": "This_Is_The_Description_For_My_Example"
+      "Description": "This job sync the GitSyncJob repository to CodeCommit",
+      "GitSyncServiceURL": "http://localhost:3000",
+      "GitSyncAccessToken": "****",
+      "GitSyncAccessSecret": "****",
+      "Repository": "",
+      "RepositoryType": "GITHUB",
+      "CodeCommitRepository": "codecommit::eu-west-2://Repository",
+      "CodeCommitAccessRoleArn": "RoleArn"
     },
     "previousResourceState": null,
     "logicalResourceIdentifier": null

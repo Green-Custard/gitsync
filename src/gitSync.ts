@@ -1,7 +1,7 @@
-import axios, {AxiosInstance} from 'axios';
+import axios, {AxiosInstance, AxiosResponse} from 'axios';
 
 import {LoggerProxy} from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
-import {AuthProps, CreateProps, DelProps, FetchProps, GitSyncJob} from './gitSyncAPI';
+import {AuthProps, CreateProps, DelProps, Errors, FetchProps, GitSyncJob} from './gitSyncAPI';
 import {SSM} from '@viperhq/secrets';
 import {pick} from './utils';
 
@@ -81,18 +81,29 @@ export const fetch = async (props: FetchProps, _: LoggerProxy): Promise<GitSyncJ
     client: props.ssm,
   });
   const name = `${secretPrefix}/${props.jobID}`;
-  const authProps: AuthProps = JSON.parse(
-    (
-      await ssm.batchGet([
-        {
-          name,
-        },
-      ])
-    )[name]
-  );
+  const authString = (
+    await ssm.batchGet([
+      {
+        name,
+        default: '',
+      },
+    ])
+  )[name];
+  if (!authString) {
+    throw new Error(Errors.NOT_FOUND);
+  }
+  const authProps: AuthProps = JSON.parse(authString);
   const instance = createAxios(authProps);
 
-  const response = await instance.get<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
+  let response: AxiosResponse<GitSyncServiceResponse>;
+  try {
+    response = await instance.get<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
+  } catch (error) {
+    if (error.response.status === 404) {
+      throw new Error(Errors.NOT_FOUND);
+    }
+    throw error;
+  }
 
   return {
     jobID: response.data.id,
@@ -108,10 +119,14 @@ export const del = async (props: DelProps, _: LoggerProxy): Promise<void> => {
     client: props.ssm,
   });
   const instance = createAxios(props);
-  await ssm.batchDelete([
-    {
-      name: `${secretPrefix}/${props.jobID}`,
-    },
-  ]);
   await instance.delete<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
+  try {
+    await ssm.batchDelete([
+      {
+        name: `${secretPrefix}/${props.jobID}`,
+      },
+    ]);
+  } catch (e) {
+    throw new Error(Errors.NOT_FOUND);
+  }
 };
