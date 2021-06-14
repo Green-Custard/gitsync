@@ -106,7 +106,7 @@ cp cicd/GitSyncJobRepository.params.example cicd/GitSyncJobRepository.params
 # vim cicd/GitSyncJobRepository.params
 bash ./deploy_cicd.sh
 # Add deploy key
-# Add Webhook
+# Add Webhook and Webhook Secret
 ```
 
 ## How it works
