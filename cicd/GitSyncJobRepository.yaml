@@ -42,7 +42,7 @@ Resources:
   GitSyncJobRepositoryJob:
     Type: GC::GitSync::Job
     Properties:
-      Description: This job sync the GitSyncJob repository to CodeCommit
+      Description: This job syncs the GitSyncJob repository to CodeCommit
       GitSyncServiceURL: !Ref GitSyncServiceURL
       GitSyncAccessToken: !Ref GitSyncAccessToken
       GitSyncAccessSecret: !Ref GitSyncAccessSecret
@@ -66,10 +66,10 @@ Resources:
         - PolicyName: GitSyncJobRepositoryAccess
           PolicyDocument:
             Statement:
-              # This should be changed if this code is being copied
+              # This should be changed if this code is being copied or boundary has to be defined
               - Effect: Allow
-                Action: "*"
-                Resource: "*"
+                Action: '*'
+                Resource: '*'
   GitSyncJobArtifactBucket:
     Type: AWS::S3::Bucket
     Properties:

@@ -1,3 +1,4 @@
+SSHGithubURL=git@github.com:attila-varga-gc/gitsync.git
 GitSyncServiceURL=https://example.com
 GitSyncAccessToken=*******
 GitSyncAccessSecret=*******
