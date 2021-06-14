@@ -18,7 +18,7 @@ import {ResourceModel} from './models';
 import {Errors, RepositoryType} from './gitSyncAPI';
 import AWS from 'aws-sdk';
 
-let gitSyncFactory = import('./gitSync');
+import * as gitSync from './gitSync';
 
 interface CallbackContext extends Record<string, any> {}
 
@@ -30,7 +30,6 @@ class Resource extends BaseResource<ResourceModel> {
     _: CallbackContext,
     logger: LoggerProxy
   ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-    const gitSync = await gitSyncFactory;
     const model = new ResourceModel(request.desiredResourceState);
     const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
     try {
@@ -52,6 +51,7 @@ class Resource extends BaseResource<ResourceModel> {
       model.webhookURL = job.webhookURL;
       model.webhookSecret = job.webhookSecret;
       model.syncStatusURL = job.syncStatusURL;
+      delete model.gitSyncAccessSecret;
       progress.status = OperationStatus.Success;
     } catch (err) {
       logger.log(err);
@@ -70,7 +70,6 @@ class Resource extends BaseResource<ResourceModel> {
     _: CallbackContext,
     logger: LoggerProxy
   ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-    const gitSync = await gitSyncFactory;
     const model = new ResourceModel(request.desiredResourceState);
     const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>();
     try {
@@ -108,7 +107,6 @@ class Resource extends BaseResource<ResourceModel> {
     _: CallbackContext,
     logger: LoggerProxy
   ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-    const gitSync = await gitSyncFactory;
     const model = new ResourceModel(request.desiredResourceState);
     const progress = ProgressEvent.progress<ProgressEvent<ResourceModel, CallbackContext>>(model);
     try {
@@ -124,6 +122,7 @@ class Resource extends BaseResource<ResourceModel> {
       model.webhookURL = job.webhookURL;
       model.webhookSecret = job.webhookSecret;
       model.syncStatusURL = job.syncStatusURL;
+      delete model.gitSyncAccessSecret;
       progress.status = OperationStatus.Success;
     } catch (err) {
       if (err.message === Errors.NOT_FOUND) {
@@ -149,7 +148,6 @@ class Resource extends BaseResource<ResourceModel> {
     _: CallbackContext,
     logger: LoggerProxy
   ): Promise<ProgressEvent<ResourceModel, CallbackContext>> {
-    const gitSync = await gitSyncFactory;
     const model = new ResourceModel(request.desiredResourceState);
     const progress = ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
       .status(OperationStatus.Success)
@@ -168,13 +166,14 @@ class Resource extends BaseResource<ResourceModel> {
       model.webhookURL = job.webhookURL;
       model.webhookSecret = job.webhookSecret;
       model.syncStatusURL = job.syncStatusURL;
+      delete model.gitSyncAccessSecret;
       progress.status = OperationStatus.Success;
     } catch (err) {
       if (err.message === Errors.NOT_FOUND) {
-        return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
-          HandlerErrorCode.NotFound,
-          err.message
-        );
+        return ProgressEvent.builder<ProgressEvent<ResourceModel, CallbackContext>>()
+          .status(OperationStatus.Success)
+          .resourceModels([])
+          .build();
       }
       logger.log(err);
       return ProgressEvent.failed<ProgressEvent<ResourceModel, CallbackContext>>(
@@ -202,7 +201,7 @@ export function contractEntrypoint(
   eventData: any,
   context: LambdaContext
 ): Promise<CfnResponse<ResourceModel>> {
-  gitSyncFactory = import('./__mocks__/gitSync');
+  process.env.MOCKED = 'TRUE';
   return resource.entrypoint(eventData, context);
 }
 
@@ -210,6 +209,6 @@ export function testEntrypoint(
   eventData: any,
   context?: Partial<LambdaContext>
 ): Promise<ProgressEvent<ResourceModel, Dict<any>>> {
-  gitSyncFactory = import('./__mocks__/gitSync');
+  process.env.MOCKED = 'TRUE';
   return resource.testEntrypoint(eventData, context);
 }

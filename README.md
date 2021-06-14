@@ -78,6 +78,12 @@ GitSyncJobRepositoryJob:
 - Easy and fast multi-region deployments while having access to git metadata in the pipelines (for
   example `git describe --tags --abbrev=1`)
 
+## Run Contract Tests
+
+```bash
+npm test
+```
+
 ## How to use
 
 - Fork this repository

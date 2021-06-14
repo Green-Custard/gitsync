@@ -94,9 +94,10 @@ Delete a SyncJob
 
 ##### Responses
 
-| Code | Description                          | Schema              |
-| ---- | ------------------------------------ | ------------------- |
-| 200  | Deleted the SyncJob or did not exist | [SyncJob](#syncjob) |
+| Code | Description            |
+| ---- | ---------------------- |
+| 200  | Deleted the SyncJob    |
+| 404  | SyncJob does not exist |
 
 ##### Security
 

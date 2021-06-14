@@ -80,9 +80,9 @@ paths:
           type: string
       responses:
         '200':
-          description: Deleted the SyncJob or did not exist
-          schema:
-            $ref: '#/definitions/SyncJob'
+          description: Deleted the SyncJob
+        '404':
+          description: SyncJob does not exist
   /webhook/{id}:
     get:
       tags:

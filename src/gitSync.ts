@@ -2,11 +2,12 @@ import axios, {AxiosInstance, AxiosResponse} from 'axios';
 
 import {LoggerProxy} from '@amazon-web-services-cloudformation/cloudformation-cli-typescript-lib';
 import {AuthProps, CreateProps, DelProps, Errors, FetchProps, GitSyncJob} from './gitSyncAPI';
-import {SSM} from '@viperhq/secrets';
+import {SSM, SSMParameter, SSMParameterPut} from '@viperhq/secrets';
 import {pick} from './utils';
 
 const timeout = 30000;
 const secretPrefix = '/GC/GitSync';
+const defaultId = '42';
 
 type GitSyncServiceResponse = {
   id: string;
@@ -31,18 +32,37 @@ type GitSyncServiceResponse = {
 
 const createAxios = (props: AuthProps): AxiosInstance =>
   axios.create({
-    baseURL: `${props.gitSyncServiceURL}/api`,
+    baseURL:
+      (process.env.MOCKED && 'http://host.docker.internal:3124') ||
+      `${props.gitSyncServiceURL}/api`,
     timeout,
-    headers: {
-      'x-access-key': props.gitSyncAccessToken,
-      'x-access-secret': props.gitSyncAccessSecret,
-    },
+    headers:
+      (!process.env.MOCKED && {
+        'x-access-key': props.gitSyncAccessToken,
+        'x-access-secret': props.gitSyncAccessSecret,
+      }) ||
+      {},
   });
 
+const createSSM = (client: AWS.SSM): SSM => {
+  if (!process.env.MOCKED) {
+    return new SSM({
+      client,
+    });
+  }
+  return {
+    put: async (params: SSMParameterPut) => {
+      return params.content;
+    },
+    batchGet: async (params: SSMParameter[]) => ({
+      [params[0].name]: '{}',
+    }),
+    batchDelete: async (params: SSMParameter[]) => [params[0].name],
+  } as Partial<SSM> as SSM;
+};
+
 export const create = async (props: CreateProps, _: LoggerProxy): Promise<GitSyncJob> => {
-  const ssm = new SSM({
-    client: props.ssm,
-  });
+  const ssm = createSSM(props.ssm);
   const instance = createAxios(props);
   let response: AxiosResponse<GitSyncServiceResponse>;
   try {
@@ -85,9 +105,7 @@ export const create = async (props: CreateProps, _: LoggerProxy): Promise<GitSyn
 };
 
 export const fetch = async (props: FetchProps, _: LoggerProxy): Promise<GitSyncJob> => {
-  const ssm = new SSM({
-    client: props.ssm,
-  });
+  const ssm = createSSM(props.ssm);
   const name = `${secretPrefix}/${props.jobID}`;
   const authString = (
     await ssm.batchGet([
@@ -105,9 +123,9 @@ export const fetch = async (props: FetchProps, _: LoggerProxy): Promise<GitSyncJ
 
   let response: AxiosResponse<GitSyncServiceResponse>;
   try {
-    response = await instance.get<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
+    response = await instance.get<GitSyncServiceResponse>(`/syncJob/${props.jobID || defaultId}`);
   } catch (err) {
-    if (err.response.status === 404) {
+    if (err && err.response && err.response.status === 404) {
       throw new Error(Errors.NOT_FOUND);
     }
     if (err && err.config) {
@@ -126,13 +144,14 @@ export const fetch = async (props: FetchProps, _: LoggerProxy): Promise<GitSyncJ
 };
 
 export const del = async (props: DelProps, _: LoggerProxy): Promise<void> => {
-  const ssm = new SSM({
-    client: props.ssm,
-  });
+  const ssm = createSSM(props.ssm);
   const instance = createAxios(props);
   try {
-    await instance.delete<GitSyncServiceResponse>(`/syncJob/${props.jobID}`);
+    await instance.delete<GitSyncServiceResponse>(`/syncJob/${props.jobID || defaultId}`);
   } catch (err) {
+    if (err && err.response && err.response.status === 404) {
+      throw new Error(Errors.NOT_FOUND);
+    }
     if (err && err.config) {
       err.config.headers = {};
       throw err;
