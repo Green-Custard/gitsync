@@ -12,6 +12,7 @@
     "prepack": "npm run build",
     "contract:serve": "npx concurrently --kill-others 'node src/__mocks__/gitSyncServer.js' 'sam local start-lambda'",
     "test": "npx tsc; npx concurrently --kill-others 'npm run contract:serve' 'sleep 5s; cfn test --function-name ContractEntrypoint'",
+    "test:integration": "npx tsc; npx concurrently --kill-others 'sam local start-lambda' 'sleep 5s; cfn test'",
     "doc:api": "npx swagger-markdown -i ./documentation/src/swagger.yaml -o ./documentation/api.md"
   },
   "dependencies": {

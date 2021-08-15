@@ -77,9 +77,6 @@ class Resource extends BaseResource<ResourceModel> {
         {
           ssm: session.client(AWS.SSM),
           jobID: model.jobID,
-          gitSyncServiceURL: model.gitSyncServiceURL,
-          gitSyncAccessToken: model.gitSyncAccessToken,
-          gitSyncAccessSecret: model.gitSyncAccessSecret,
         },
         logger
       );
@@ -203,12 +200,4 @@ export function contractEntrypoint(
 ): Promise<CfnResponse<ResourceModel>> {
   process.env.MOCKED = 'TRUE';
   return resource.entrypoint(eventData, context);
-}
-
-export function testEntrypoint(
-  eventData: any,
-  context?: Partial<LambdaContext>
-): Promise<ProgressEvent<ResourceModel, Dict<any>>> {
-  process.env.MOCKED = 'TRUE';
-  return resource.testEntrypoint(eventData, context);
 }

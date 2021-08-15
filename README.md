@@ -78,10 +78,20 @@ GitSyncJobRepositoryJob:
 - Easy and fast multi-region deployments while having access to git metadata in the pipelines (for
   example `git describe --tags --abbrev=1`)
 
-## Run Contract Tests
+## Run Contract Tests with local mocks
 
 ```bash
 npm test
+```
+
+## Run Contract Tests with a GitSync service
+
+Boto security chain (aws sdk, cli, etc.) has to have access to the SSM Parameter store.
+
+Overrides.json has to be set up correctly.
+
+```bash
+npm run test:integration
 ```
 
 ## How to use

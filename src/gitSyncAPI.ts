@@ -22,8 +22,7 @@ export type CreateProps = {
 
 export type DelProps = {
   jobID: string;
-} & AuthProps &
-  AWSProps;
+} & AWSProps;
 
 export type FetchProps = {
   jobID: string;

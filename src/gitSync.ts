@@ -104,17 +104,22 @@ export const create = async (props: CreateProps, _: LoggerProxy): Promise<GitSyn
   };
 };
 
-export const fetch = async (props: FetchProps, _: LoggerProxy): Promise<GitSyncJob> => {
+export const fetch = async (props: FetchProps, logger: LoggerProxy): Promise<GitSyncJob> => {
   const ssm = createSSM(props.ssm);
-  const name = `${secretPrefix}/${props.jobID}`;
-  const authString = (
-    await ssm.batchGet([
-      {
-        name,
-        default: '',
-      },
-    ])
-  )[name];
+  const name = `${secretPrefix}/${props.jobID || defaultId}`;
+  let authString: undefined | string = '';
+  try {
+    authString = (
+      await ssm.batchGet([
+        {
+          name,
+          default: '',
+        },
+      ])
+    )[name];
+  } catch (e) {
+    logger.log(e);
+  }
   if (!authString) {
     throw new Error(Errors.NOT_FOUND);
   }
@@ -143,9 +148,27 @@ export const fetch = async (props: FetchProps, _: LoggerProxy): Promise<GitSyncJ
   };
 };
 
-export const del = async (props: DelProps, _: LoggerProxy): Promise<void> => {
+export const del = async (props: DelProps, logger: LoggerProxy): Promise<void> => {
   const ssm = createSSM(props.ssm);
-  const instance = createAxios(props);
+  const name = `${secretPrefix}/${props.jobID || defaultId}`;
+  let authString: undefined | string = '';
+  try {
+    authString = (
+      await ssm.batchGet([
+        {
+          name,
+          default: '',
+        },
+      ])
+    )[name];
+  } catch (e) {
+    logger.log(e);
+  }
+  if (!authString) {
+    throw new Error(Errors.NOT_FOUND);
+  }
+  const authProps: AuthProps = JSON.parse(authString);
+  const instance = createAxios(authProps);
   try {
     await instance.delete<GitSyncServiceResponse>(`/syncJob/${props.jobID || defaultId}`);
   } catch (err) {
@@ -156,11 +179,12 @@ export const del = async (props: DelProps, _: LoggerProxy): Promise<void> => {
       err.config.headers = {};
       throw err;
     }
+    throw err;
   }
   try {
     await ssm.batchDelete([
       {
-        name: `${secretPrefix}/${props.jobID}`,
+        name: `${secretPrefix}/${props.jobID || defaultId}`,
       },
     ]);
   } catch (err) {
