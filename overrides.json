@@ -1,10 +1,10 @@
 {
   "CREATE": {
     "/GitSyncServiceURL": "https://gitsync.green-custard.com",
-    "/GitSyncAccessToken": "****",
-    "/GitSyncAccessSecret": "****",
+    "/GitSyncAccessToken": "Vqlwn8LGIN5XwTox",
+    "/GitSyncAccessSecret": "onvZLVd2KIYd22BG",
     "/Repository": "git@github.com:Green-Custard/gitsync.git",
     "/CodeCommitRepository": "codecommit::eu-west-2://Repository",
-    "/CodeCommitAccessRoleArn": "arn:aws:iam::****:role/production-ServiceRole"
+    "/CodeCommitAccessRoleArn": "arn:aws:iam::111111111111:role/production-ServiceRole"
   }
 }
