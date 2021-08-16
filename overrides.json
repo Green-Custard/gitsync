@@ -3,7 +3,7 @@
     "/GitSyncServiceURL": "https://gitsync.green-custard.com",
     "/GitSyncAccessToken": "****",
     "/GitSyncAccessSecret": "****",
-    "/Repository": "git@github.com:attila-varga-gc/gitsync.git",
+    "/Repository": "git@github.com:Green-Custard/gitsync.git",
     "/CodeCommitRepository": "codecommit::eu-west-2://Repository",
     "/CodeCommitAccessRoleArn": "arn:aws:iam::****:role/production-ServiceRole"
   }

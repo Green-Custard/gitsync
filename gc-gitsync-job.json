@@ -1,7 +1,7 @@
 {
   "typeName": "GC::GitSync::Job",
   "description": "Git Sync Jobs for an existing GC Git Sync solution",
-  "sourceUrl": "https://github.com/attila-varga-gc/gitsync.git",
+  "sourceUrl": "https://github.com/Green-Custard/gitsync.git",
   "properties": {
     "Description": {
       "description": "The description of the Sync Job.",
